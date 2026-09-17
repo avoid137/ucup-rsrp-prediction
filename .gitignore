@@ -1,0 +1,29 @@
+# === 赛题数据（保密，禁止提交） ===
+data/
+TrainingData*/
+celldata/
+*.ply
+ep.json
+train_signal.csv
+test_points.csv
+
+# === 生成产物 ===
+outputs/
+output.zip
+*.pkl
+*.pth
+simulation_data*.csv
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# === 编辑器 / 系统 ===
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,6 @@
+# 统一换行符，避免跨平台（Windows 检出 CRLF / Linux 检出 LF）造成的假 diff
+* text=auto
+*.py  text eol=lf
+*.md  text eol=lf
+*.txt text eol=lf
+*.gitignore text eol=lf
