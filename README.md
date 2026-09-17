@@ -28,6 +28,8 @@
     └─ 4. generate_submission.py     逐点预测 → output.zip
 
     features.py                     第 1~4 步共用的 17 维特征实现（唯一来源）
+
+    smoke_test.py                   合成数据冒烟测试（不碰赛题数据，验证上面几条声称）
 ```
 
 ### 1. 点云转网格（`pointcloud_to_mesh.py`）
@@ -152,6 +154,25 @@ train / val / test 其中之一**。
 **这些修正都只做了静态与合成数据验证**（用小规模合成数据集把训练→推理全流程跑通，
 校验了分组不重叠、续训前缀成立、早停生效、提交包生成），**没有在真实赛题数据上重跑**。
 
+### 怎么自己核验这些声称
+
+不用赛题数据也能验。`smoke_test.py` 会现造一份结构相同、内容全随机的假数据集，
+跑完「训练 → 推理」全流程，然后**程序化断言**下面四条（不是靠注释声明）：
+
+```bash
+python smoke_test.py     # 期望 4/4 通过
+```
+
+| 检查项 | 断言的是什么 |
+|---|---|
+| 分组划分不跨基站 | train / val / test 三个集合的 `cell_id` **两两不相交** |
+| 特征两阶段同源 | `engineer_features` 对"带干扰同名列的表"与"干净表"给出**完全一致**的特征值；`distance` 按 x、y 现算；`angle` 落在 `[0,360)` |
+| 阶段 2 是真续训 | 阶段 1 的树序列是阶段 2 树序列的**前缀**（`xgb_model` 真生效，不是重训） |
+| 早停生效 | 阶段 1 保留的树数 **< n_estimators**（否则说明早停被静默关掉了） |
+| 提交包结构 | `output.zip` 生成、每个测试基站一个 CSV、列名正确 |
+
+> 它验证的是**逻辑**，不是成绩——假数据上的 MAE 没有任何意义，测试里也不做断言。
+
 ---
 
 ## 已知局限
@@ -172,6 +193,9 @@ train / val / test 其中之一**。
 
 ```bash
 pip install -r requirements.txt
+
+# 0. 可选：不需要赛题数据，先确认代码逻辑没问题
+python smoke_test.py
 
 export UCUP_DATA_ROOT=/path/to/TrainingData.26UCupSummer
 export UCUP_MESH_DIR=/path/to/TrainingData_Meshes_v2
